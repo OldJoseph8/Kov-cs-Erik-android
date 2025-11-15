@@ -12,12 +12,11 @@ import androidx.fragment.app.Fragment;
 
 import com.example.piacpalota.MainActivity;
 import com.example.piacpalota.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+// TÖRÖLTÜK A FIREBASE IMPORT-okat
 
 public class LogInFragment extends Fragment {
 
-    private FirebaseAuth mAuth;
+    // private FirebaseAuth mAuth; // TÖRÖLVE
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -25,8 +24,8 @@ public class LogInFragment extends Fragment {
         // Infláljuk az XML layoutot
         View view = inflater.inflate(R.layout.fragment_log_in, container, false);
 
-        // Firebase Auth inicializálása
-        mAuth = FirebaseAuth.getInstance();
+        // Firebase Auth inicializálása TÖRÖLVE
+        // mAuth = FirebaseAuth.getInstance();
 
         Button loginButton = view.findViewById(R.id.logButton);
         EditText emailEditText = view.findViewById(R.id.emailEditText); // Email cím
@@ -37,37 +36,23 @@ public class LogInFragment extends Fragment {
             String email = emailEditText.getText().toString();
             String password = passwordEditText.getText().toString();
 
+            // Csak azt ellenőrizzük, hogy nem üres-e
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(getActivity(), "Email és jelszó nem lehet üres", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Email validálás
-            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                Toast.makeText(getActivity(), "Érvényes email címet adj meg!", Toast.LENGTH_SHORT).show();
-                return;
+            // --- AZ EGÉSZ FIREBASE BLOKK TÖRÖLVE ---
+
+            // Csak egy "siker" üzenetet mutatunk
+            Toast.makeText(getActivity(), "Sikeres bejelentkezés!", Toast.LENGTH_SHORT).show();
+
+            // Menü frissítése a MainActivity-ben
+            MainActivity mainActivity = (MainActivity) getActivity();
+            if (mainActivity != null) {
+                mainActivity.replaceFragment(new WelcomeFragment());
+                mainActivity.invalidateOptionsMenu();  // Menü frissítése
             }
-
-            // Bejelentkezés Firebase-be
-            mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(getActivity(), task -> {
-                        if (task.isSuccessful()) {
-                            // Bejelentkezés sikeres
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            Toast.makeText(getActivity(), "Sikeres bejelentkezés!", Toast.LENGTH_SHORT).show();
-
-                            // Menü frissítése a MainActivity-ben
-                            MainActivity mainActivity = (MainActivity) getActivity();
-                            if (mainActivity != null) {
-                                mainActivity.replaceFragment(new WelcomeFragment());
-                                mainActivity.invalidateOptionsMenu();  // Menü frissítése
-                            }
-
-                        } else {
-                            // Hiba történt a bejelentkezéskor
-                            Toast.makeText(getActivity(), "Hiba történt: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
         });
 
         return view;
