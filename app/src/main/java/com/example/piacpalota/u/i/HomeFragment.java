@@ -1,14 +1,17 @@
 package com.example.piacpalota.u.i;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
 import com.example.piacpalota.R;
-import com.example.piacpalota.MainActivity;
 
 public class HomeFragment extends Fragment {
 
@@ -20,15 +23,26 @@ public class HomeFragment extends Fragment {
         Button loginButton = view.findViewById(R.id.welcBuyButton);
         Button regButton = view.findViewById(R.id.welcSaleButton);
 
-        // Fragment tranzakció a helyes fragmenthez
+        // --- EZ A RÉSZ LETT JAVÍTVA (kis 'l', kis 'f') ---
         loginButton.setOnClickListener(v -> {
-            // Használjuk a replaceFragment metódust a MainActivity-ben
-            ((MainActivity) requireActivity()).replaceFragment(new LogInFragment());
+            try {
+                // A 'nav_graph.xml'-ben szereplő helyes ID használata
+                Navigation.findNavController(v).navigate(R.id.loginFragment);
+            } catch (Exception e) {
+                Log.e("HomeFragment", "Navigációs hiba (LogIn)", e);
+                Toast.makeText(getContext(), "Hoppá, hiba történt!", Toast.LENGTH_SHORT).show();
+            }
         });
 
+        // --- EZ A RÉSZ IS JAVÍTVA LETT (kis 's', kis 'f') ---
         regButton.setOnClickListener(v -> {
-            // Ugyanez a regisztrációs fragmenthez
-            ((MainActivity) requireActivity()).replaceFragment(new SingInFragment());
+            try {
+                // A 'nav_graph.xml'-ben szereplő helyes ID használata
+                Navigation.findNavController(v).navigate(R.id.singinFragment);
+            } catch (Exception e) {
+                Log.e("HomeFragment", "Navigációs hiba (SingIn)", e);
+                Toast.makeText(getContext(), "Hoppá, hiba történt!", Toast.LENGTH_SHORT).show();
+            }
         });
 
         return view;
