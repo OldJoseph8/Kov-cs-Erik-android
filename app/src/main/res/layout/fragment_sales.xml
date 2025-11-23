@@ -17,7 +17,7 @@
             android:text="Hirdetés Feladása"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:layout_marginBottom="32dp"/>
+            android:layout_marginBottom="24dp"/>
 
         <EditText
             android:id="@+id/inputName"
@@ -48,28 +48,29 @@
             android:id="@+id/inputDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Részletes leírás (állapot, felszereltség...)"
+            android:hint="Részletes leírás..."
             android:inputType="textMultiLine"
             android:lines="3"
             android:gravity="top|start"
             android:minHeight="100dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="24dp"
             android:background="@android:drawable/edit_text"/>
 
+        <ImageView
+            android:id="@+id/ivSelectedImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:src="@drawable/placeholder"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="16dp"
+            android:background="#E0E0E0"/>
+
         <Button
-            android:id="@+id/btnSelectImages"
+            android:id="@+id/btnSelectImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Képek kiválasztása (Max 5)"
+            android:text="Kép kiválasztása"
             android:backgroundTint="#9C27B0"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView
-            android:id="@+id/txtImageCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nincs kép kiválasztva"
-            android:textColor="#757575"
             android:layout_marginBottom="32dp"/>
 
         <Button
