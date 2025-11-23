@@ -93,9 +93,10 @@
                 android:layout_marginTop="16dp"/>
 
             <TextView
+                android:id="@+id/tvDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ez egy kiváló állapotban lévő gépjármű."
+                android:text="Leírás betöltése..."
                 android:layout_marginTop="4dp"
                 android:lineSpacingExtra="4dp"/>
 

@@ -7,32 +7,37 @@ public class Product {
     private String price;
     private String quantity;
     private String location;
-    private List<String> images; // Ez most már lista!
+    private String description; // <--- ÚJ MEZŐ: Leírás
+    private List<String> images; // <--- ÚJ MEZŐ: Képek listája
 
-    public Product(String name, String price, String quantity, String location, List<String> images) {
+    // A konstruktor frissítve, hogy fogadja a leírást és a képlisát is
+    public Product(String name, String price, String quantity, String location, String description, List<String> images) {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
         this.location = location;
+        this.description = description;
         this.images = images;
     }
 
+    // Getters
     public String getName() { return name; }
     public String getPrice() { return price; }
     public String getQuantity() { return quantity; }
     public String getLocation() { return location; }
+    public String getDescription() { return description; } // <--- ÚJ GETTER
 
-    // Visszaadja az összes képet
+    // Setters
+    public void setQuantity(String quantity) { this.quantity = quantity; }
+
+    // Képek lekérése
     public List<String> getImages() { return images; }
 
-    // Visszaadja az ELSŐ képet (borítóképnek a listához)
+    // Segédfüggvény: Csak az első képet adja vissza (listákhoz, borítóképnek)
     public String getThumbnailUrl() {
         if (images != null && !images.isEmpty()) {
             return images.get(0);
         }
-        return ""; // Üres, ha nincs kép
-    }
-
-    public void setQuantity(String newQuantity) {
+        return ""; // Ha nincs kép, üreset ad vissza
     }
 }

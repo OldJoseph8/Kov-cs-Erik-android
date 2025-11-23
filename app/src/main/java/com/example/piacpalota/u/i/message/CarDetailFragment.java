@@ -26,6 +26,7 @@ public class CarDetailFragment extends Fragment {
         TextView priceText = view.findViewById(R.id.detailPrice);
         TextView locationText = view.findViewById(R.id.detailLocation);
         TextView quantityText = view.findViewById(R.id.detailQuantity);
+        TextView descriptionText = view.findViewById(R.id.tvDescription); // <--- ÚJ
         ImageView imageView = view.findViewById(R.id.detailImage);
         View btnContact = view.findViewById(R.id.btnContact);
 
@@ -35,10 +36,10 @@ public class CarDetailFragment extends Fragment {
             locationText.setText(getArguments().getString("productLocation"));
             quantityText.setText(getArguments().getString("productQuantity"));
 
-            // Képek listájának átvétele
-            ArrayList<String> images = getArguments().getStringArrayList("productImages");
+            // LEÍRÁS BEÁLLÍTÁSA
+            descriptionText.setText(getArguments().getString("productDescription"));
 
-            // Az első kép megjelenítése
+            ArrayList<String> images = getArguments().getStringArrayList("productImages");
             if (images != null && !images.isEmpty()) {
                 Glide.with(this).load(images.get(0)).placeholder(R.drawable.placeholder).into(imageView);
             }

@@ -44,6 +44,18 @@
             android:minHeight="48dp"
             android:layout_marginBottom="16dp"/>
 
+        <EditText
+            android:id="@+id/inputDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Részletes leírás (állapot, felszereltség...)"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:gravity="top|start"
+            android:minHeight="100dp"
+            android:layout_marginBottom="16dp"
+            android:background="@android:drawable/edit_text"/>
+
         <Button
             android:id="@+id/btnSelectImages"
             android:layout_width="match_parent"

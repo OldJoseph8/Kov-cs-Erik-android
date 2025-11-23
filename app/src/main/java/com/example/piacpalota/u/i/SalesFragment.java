@@ -29,15 +29,13 @@ public class SalesFragment extends Fragment {
     private List<String> selectedImageUris = new ArrayList<>();
     private TextView txtImageCount;
 
-    // Galéria megnyitó
     private final ActivityResultLauncher<Intent> pickImagesLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                    selectedImageUris.clear(); // Töröljük az előző választást
+                    selectedImageUris.clear();
                     Intent data = result.getData();
 
-                    // Ha több képet választott
                     if (data.getClipData() != null) {
                         int count = data.getClipData().getItemCount();
                         if (count > 5) {
@@ -48,13 +46,10 @@ public class SalesFragment extends Fragment {
                             Uri imageUri = data.getClipData().getItemAt(i).getUri();
                             selectedImageUris.add(imageUri.toString());
                         }
-                    }
-                    // Ha csak egy képet választott
-                    else if (data.getData() != null) {
+                    } else if (data.getData() != null) {
                         Uri imageUri = data.getData();
                         selectedImageUris.add(imageUri.toString());
                     }
-
                     updateImageCountText();
                 }
             }
@@ -68,38 +63,37 @@ public class SalesFragment extends Fragment {
         EditText inputName = view.findViewById(R.id.inputName);
         EditText inputPrice = view.findViewById(R.id.inputPrice);
         EditText inputLocation = view.findViewById(R.id.inputLocation);
+        EditText inputDescription = view.findViewById(R.id.inputDescription); // <--- ÚJ
         Button btnSelectImages = view.findViewById(R.id.btnSelectImages);
         txtImageCount = view.findViewById(R.id.txtImageCount);
         Button btnSubmit = view.findViewById(R.id.btnSubmit);
 
-        // Képválasztó gomb
         btnSelectImages.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true); // Több kép engedélyezése
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             pickImagesLauncher.launch(Intent.createChooser(intent, "Válassz képeket"));
         });
 
-        // Beküldés gomb
         btnSubmit.setOnClickListener(v -> {
             String name = inputName.getText().toString();
             String price = inputPrice.getText().toString();
             String location = inputLocation.getText().toString();
+            String description = inputDescription.getText().toString(); // <--- ÚJ
 
-            if (name.isEmpty() || price.isEmpty() || location.isEmpty()) {
+            if (name.isEmpty() || price.isEmpty() || location.isEmpty() || description.isEmpty()) {
                 Toast.makeText(getContext(), "Kérlek tölts ki minden mezőt!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (selectedImageUris.isEmpty()) {
-                // Ha nem választott képet, teszünk be egy placeholdert
                 selectedImageUris.add("https://via.placeholder.com/150");
             }
 
-            // Új listát hozunk létre a tároláshoz, hogy ne vesszen el a referencia
             List<String> imagesToSave = new ArrayList<>(selectedImageUris);
 
-            Product newCar = new Product(name, price, "1 db", location, imagesToSave);
+            // Itt adjuk át a description-t is
+            Product newCar = new Product(name, price, "1 db", location, description, imagesToSave);
             CarRepository.getInstance().addProduct(newCar);
 
             Toast.makeText(getContext(), "Hirdetés sikeresen feladva!", Toast.LENGTH_SHORT).show();
@@ -107,7 +101,7 @@ public class SalesFragment extends Fragment {
             try {
                 Navigation.findNavController(view).navigate(R.id.buyFragment);
             } catch (Exception e) {
-                // Hiba kezelés
+                // ...
             }
         });
 

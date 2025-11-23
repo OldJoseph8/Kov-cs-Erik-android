@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.piacpalota.R;
 import com.example.piacpalota.u.i.buylist.Product;
 
-import java.util.ArrayList; // Fontos import!
+import java.util.ArrayList;
 import java.util.List;
 
 public class ShoppingFragment extends Fragment {
@@ -36,6 +36,8 @@ public class ShoppingFragment extends Fragment {
         submitOrderButton = view.findViewById(R.id.button_submit_order);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // A közös kosárkezelőt használjuk
         cartItems = CartManager.getInstance().getCartItems();
 
         cartAdapter = new CartAdapter(getContext(), cartItems, new CartAdapter.OnCartItemClickListener() {
@@ -51,8 +53,6 @@ public class ShoppingFragment extends Fragment {
                 int position = cartItems.indexOf(product);
                 if (position != -1) {
                     CartManager.getInstance().removeFromCart(product);
-                    // Nem kell a cartItems.remove(position), mert a CartManager referencia ugyanaz!
-                    // De a biztonság kedvéért frissítjük az adaptert.
                     cartAdapter.notifyItemRemoved(position);
                     updateCartView();
                 } else {
@@ -62,7 +62,7 @@ public class ShoppingFragment extends Fragment {
         });
         recyclerView.setAdapter(cartAdapter);
 
-        // Adatok fogadása az érkező Bundle-ből
+        // --- ADATOK FOGADÁSA ÉS TERMÉK LÉTREHOZÁSA ---
         Bundle bundle = getArguments();
         if (bundle != null) {
             String productName = bundle.getString("productName");
@@ -70,22 +70,24 @@ public class ShoppingFragment extends Fragment {
             String productQuantity = bundle.getString("productQuantity");
             String productLocation = bundle.getString("productLocation");
 
-            // --- ITT A JAVÍTÁS: Képek listájának átvétele ---
-            ArrayList<String> productImages = bundle.getStringArrayList("productImages");
+            // 1. JAVÍTÁS: Kivesszük a leírást is
+            String productDescription = bundle.getString("productDescription");
+            if (productDescription == null) productDescription = ""; // Biztonsági ellenőrzés
 
-            // Ha véletlenül null jönne (régi hívás), kezeljük le:
+            // 2. Képek listájának átvétele
+            ArrayList<String> productImages = bundle.getStringArrayList("productImages");
             if (productImages == null) {
                 productImages = new ArrayList<>();
-                productImages.add("https://via.placeholder.com/150"); // Alapértelmezett kép
+                productImages.add("https://via.placeholder.com/150");
             }
 
-            // Termék hozzáadása a kosárhoz (Most már listát adunk át!)
-            Product product = new Product(productName, productPrice, productQuantity, productLocation, productImages);
+            // 3. JAVÍTÁS: A konstruktorba beillesztjük a 'productDescription'-t
+            Product product = new Product(productName, productPrice, productQuantity, productLocation, productDescription, productImages);
 
-            // Ellenőrizzük, hogy ne adjuk hozzá duplán, ha már benne van
+            // Ellenőrizzük, hogy ne adjuk hozzá duplán
             boolean alreadyInCart = false;
             for (Product p : cartItems) {
-                if (p.getName().equals(productName)) { // Egyszerű ellenőrzés név alapján
+                if (p.getName().equals(productName)) {
                     alreadyInCart = true;
                     break;
                 }
@@ -93,11 +95,10 @@ public class ShoppingFragment extends Fragment {
 
             if (!alreadyInCart) {
                 CartManager.getInstance().addToCart(product);
-                // A cartItems referencia automatikusan frissül, ha a CartManager ugyanazt a listát használja
                 cartAdapter.notifyDataSetChanged();
             }
-            // ------------------------------------------------
         }
+        // ----------------------------------------------
 
         updateCartView();
 
@@ -121,23 +122,14 @@ public class ShoppingFragment extends Fragment {
     @SuppressLint("NotifyDataSetChanged")
     private void submitOrder() {
         if (cartItems.isEmpty()) {
-            Toast.makeText(getContext(), "A kosár üres, nem lehet rendelést leadni.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "A kosár üres.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        for (Product product : cartItems) {
-            sendOrderToAdvertiser(product);
-        }
-
+        // Itt lehetne elküldeni a rendelést...
         CartManager.getInstance().clearCart();
         cartAdapter.notifyDataSetChanged();
         updateCartView();
-
-        Toast.makeText(getContext(), "A rendelés sikeresen leadva!", Toast.LENGTH_SHORT).show();
-    }
-
-    private void sendOrderToAdvertiser(Product product) {
-        // Placeholder
+        Toast.makeText(getContext(), "Rendelés leadva!", Toast.LENGTH_SHORT).show();
     }
 
     @SuppressLint("NotifyDataSetChanged")
