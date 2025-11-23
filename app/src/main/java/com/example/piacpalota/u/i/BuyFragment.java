@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -15,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.piacpalota.R;
 import com.example.piacpalota.u.i.buylist.BuyAdapter;
+import com.example.piacpalota.u.i.buylist.CarRepository; // Ez kell az adatokhoz
 import com.example.piacpalota.u.i.buylist.Product;
 
 import java.util.ArrayList;
@@ -34,18 +34,14 @@ public class BuyFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        buyList = new ArrayList<>();
+        // --- ADATOK BETÖLTÉSE A KÖZÖS TÁROLÓBÓL ---
+        // Így látni fogod azokat az autókat is, amiket a SalesFragment-en adtál hozzá
+        buyList = CarRepository.getInstance().getProducts();
+        // -------------------------------------------
 
-        // --- "KAMU" ADATOK ---
-        buyList.add(new Product("BMW X5", "15.000.000 Ft", "1 db", "Budapest", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/BMW_X5_%28G05%29_IMG_3953.jpg/1200px-BMW_X5_%28G05%29_IMG_3953.jpg"));
-        buyList.add(new Product("Audi A4", "8.500.000 Ft", "1 db", "Debrecen", "https://upload.wikimedia.org/wikipedia/commons/3/32/2019_Audi_A4_35_TDi_S_Line_S-Tronic_2.0_Front.jpg"));
-        buyList.add(new Product("Mercedes C-Class", "12.000.000 Ft", "1 db", "Szeged", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Mercedes-Benz_W205_Mopf_IMG_3690.jpg/1200px-Mercedes-Benz_W205_Mopf_IMG_3690.jpg"));
-        // ---------------------
-
-        // Az Adapter beállítása a két gomb eseménykezelőjével
         buyAdapter = new BuyAdapter(getContext(), buyList, new BuyAdapter.OnProductClickListener() {
 
-            // 1. KOSÁRBA GOMB KATTINTÁS
+            // 1. KOSÁRBA GOMB
             @Override
             public void onAddToCartClick(Product product) {
                 try {
@@ -54,16 +50,18 @@ public class BuyFragment extends Fragment {
                     bundle.putString("productPrice", product.getPrice());
                     bundle.putString("productQuantity", product.getQuantity());
                     bundle.putString("productLocation", product.getLocation());
-                    bundle.putString("productImageUrl", product.getImageUrl());
 
-                    // Navigálás a ShoppingFragment-re (Kosár)
+                    // KÉPEK ÁTADÁSA (Lista formátumban!)
+                    // Mivel a Bundle ArrayList-et vár, átalakítjuk a List-et ArrayList-té
+                    bundle.putStringArrayList("productImages", new ArrayList<>(product.getImages()));
+
                     Navigation.findNavController(view).navigate(R.id.shoppingFragment, bundle);
                 } catch (Exception e) {
                     Log.e("BuyFragment", "Navigációs hiba (Kosár): " + e.getMessage());
                 }
             }
 
-            // 2. RÉSZLETEK GOMB KATTINTÁS (Ez hiányzott!)
+            // 2. RÉSZLETEK GOMB
             @Override
             public void onDetailsClick(Product product) {
                 try {
@@ -72,9 +70,11 @@ public class BuyFragment extends Fragment {
                     bundle.putString("productPrice", product.getPrice());
                     bundle.putString("productQuantity", product.getQuantity());
                     bundle.putString("productLocation", product.getLocation());
-                    bundle.putString("productImageUrl", product.getImageUrl());
 
-                    // Navigálás a CarDetailFragment-re (Részletes adatlap)
+                    // KÉPEK ÁTADÁSA (Lista formátumban!)
+                    bundle.putStringArrayList("productImages", new ArrayList<>(product.getImages()));
+
+                    // Navigálás a részletes adatlapra
                     Navigation.findNavController(view).navigate(R.id.carDetailFragment, bundle);
                 } catch (Exception e) {
                     Log.e("BuyFragment", "Navigációs hiba (Részletek): " + e.getMessage());
@@ -85,5 +85,15 @@ public class BuyFragment extends Fragment {
         recyclerView.setAdapter(buyAdapter);
 
         return view;
+    }
+
+    // Fontos: Ha visszalépsz a listára, frissíteni kell a nézetet,
+    // hogy az újonnan felvett autók megjelenjenek.
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (buyAdapter != null) {
+            buyAdapter.notifyDataSetChanged();
+        }
     }
 }

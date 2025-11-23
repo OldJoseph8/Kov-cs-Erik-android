@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.piacpalota.R;
 import com.example.piacpalota.u.i.buylist.Product;
 
+import java.util.ArrayList; // Fontos import!
 import java.util.List;
 
 public class ShoppingFragment extends Fragment {
@@ -36,6 +37,7 @@ public class ShoppingFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         cartItems = CartManager.getInstance().getCartItems();
+
         cartAdapter = new CartAdapter(getContext(), cartItems, new CartAdapter.OnCartItemClickListener() {
             @Override
             public void onQuantityChange(Product product, String newQuantity) {
@@ -47,9 +49,10 @@ public class ShoppingFragment extends Fragment {
             @Override
             public void onDelete(Product product) {
                 int position = cartItems.indexOf(product);
-                if (position != -1) { // Ellenőrizzük, hogy az elem valóban a listában van
+                if (position != -1) {
                     CartManager.getInstance().removeFromCart(product);
-                    cartItems.remove(position); // Eltávolítás a listából
+                    // Nem kell a cartItems.remove(position), mert a CartManager referencia ugyanaz!
+                    // De a biztonság kedvéért frissítjük az adaptert.
                     cartAdapter.notifyItemRemoved(position);
                     updateCartView();
                 } else {
@@ -66,13 +69,34 @@ public class ShoppingFragment extends Fragment {
             String productPrice = bundle.getString("productPrice");
             String productQuantity = bundle.getString("productQuantity");
             String productLocation = bundle.getString("productLocation");
-            String productImageUrl = bundle.getString("productImageUrl");
 
-            // Termék hozzáadása a kosárhoz
-            Product product = new Product(productName, productPrice, productQuantity, productLocation, productImageUrl);
-            CartManager.getInstance().addToCart(product);
-            cartItems.add(product); // Hozzáadás a listához
-            cartAdapter.notifyItemInserted(cartItems.size() - 1);
+            // --- ITT A JAVÍTÁS: Képek listájának átvétele ---
+            ArrayList<String> productImages = bundle.getStringArrayList("productImages");
+
+            // Ha véletlenül null jönne (régi hívás), kezeljük le:
+            if (productImages == null) {
+                productImages = new ArrayList<>();
+                productImages.add("https://via.placeholder.com/150"); // Alapértelmezett kép
+            }
+
+            // Termék hozzáadása a kosárhoz (Most már listát adunk át!)
+            Product product = new Product(productName, productPrice, productQuantity, productLocation, productImages);
+
+            // Ellenőrizzük, hogy ne adjuk hozzá duplán, ha már benne van
+            boolean alreadyInCart = false;
+            for (Product p : cartItems) {
+                if (p.getName().equals(productName)) { // Egyszerű ellenőrzés név alapján
+                    alreadyInCart = true;
+                    break;
+                }
+            }
+
+            if (!alreadyInCart) {
+                CartManager.getInstance().addToCart(product);
+                // A cartItems referencia automatikusan frissül, ha a CartManager ugyanazt a listát használja
+                cartAdapter.notifyDataSetChanged();
+            }
+            // ------------------------------------------------
         }
 
         updateCartView();
@@ -113,7 +137,7 @@ public class ShoppingFragment extends Fragment {
     }
 
     private void sendOrderToAdvertiser(Product product) {
-        // Placeholder, hogy elérd a hirdetőt (pl. Firebase hívás)
+        // Placeholder
     }
 
     @SuppressLint("NotifyDataSetChanged")

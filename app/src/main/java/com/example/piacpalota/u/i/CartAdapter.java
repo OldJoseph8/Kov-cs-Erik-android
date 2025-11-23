@@ -2,7 +2,7 @@ package com.example.piacpalota.u.i;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log; // <-- FONTOS: Hozzáadtuk a Log importot a hibakezeléshez
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +12,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.navigation.Navigation; // <-- FONTOS: Ezt az új importot kellett hozzáadni
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-// import com.example.piacpalota.MainActivity; // Erre már nincs itt szükség
 import com.example.piacpalota.R;
-// import com.example.piacpalota.u.i.MessagesFragment; // Erre sem, a NavComponent kezeli
 import com.example.piacpalota.u.i.buylist.Product;
 
 import java.util.List;
@@ -56,10 +54,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.productQuantity.setText(product.getQuantity());
         holder.productLocation.setText(product.getLocation());
 
+        // --- ITT IS JAVÍTVA: getThumbnailUrl() ---
         Glide.with(context)
-                .load(product.getImageUrl())
+                .load(product.getThumbnailUrl())
                 .placeholder(R.drawable.placeholder)
                 .into(holder.productImage);
+        // ----------------------------------------
 
         holder.quantityButton.setOnClickListener(v -> {
             String currentQuantityStr = product.getQuantity();
@@ -80,24 +80,18 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             notifyItemRemoved(positionToRemove);
         });
 
-        // --- EZ A RÉSZ LETT JAVÍTVA ---
         holder.messageButton.setOnClickListener(v -> {
-            // Az adatcsomagot (Bundle) ugyanúgy összerakjuk
             Bundle bundle = new Bundle();
             bundle.putString("productName", product.getName());
             bundle.putString("productPrice", product.getPrice());
             bundle.putString("productLocation", product.getLocation());
 
-            // A régi, hibás 'replaceFragment' hívás helyett:
             try {
-                // Az új, modern NavController-t használjuk a 'v' (View) és a 'bundle' segítségével
                 Navigation.findNavController(v).navigate(R.id.messagesFragment, bundle);
             } catch (Exception e) {
-                // Hiba logolása, ha pl. nem találja a 'messagesFragment'-et a nav_graph.xml-ben
                 Log.e("CartAdapter", "Navigációs hiba: " + e.getMessage());
             }
         });
-        // --- JAVÍTÁS VÉGE ---
     }
 
     @Override
