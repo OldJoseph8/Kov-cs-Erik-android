@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,8 +23,10 @@ public class BuyAdapter extends RecyclerView.Adapter<BuyAdapter.BuyViewHolder> {
     private final List<Product> buyList;
     private final OnProductClickListener onProductClickListener;
 
+    // MÓDOSÍTVA: Két metódus van, egy a kosárnak, egy a részleteknek
     public interface OnProductClickListener {
-        void onProductClick(Product product);
+        void onAddToCartClick(Product product);
+        void onDetailsClick(Product product);
     }
 
     public BuyAdapter(Context context, List<Product> buyList, OnProductClickListener onProductClickListener) {
@@ -56,7 +57,15 @@ public class BuyAdapter extends RecyclerView.Adapter<BuyAdapter.BuyViewHolder> {
                 .placeholder(R.drawable.placeholder)
                 .into(holder.productImage);
 
-        holder.cartButton.setOnClickListener(v -> onProductClickListener.onProductClick(product));
+        // MÓDOSÍTVA: Kosár gomb eseménykezelője
+        holder.cartButton.setOnClickListener(v -> {
+            onProductClickListener.onAddToCartClick(product);
+        });
+
+        // MÓDOSÍTVA: Részletek gomb eseménykezelője
+        holder.detailsButton.setOnClickListener(v -> {
+            onProductClickListener.onDetailsClick(product);
+        });
     }
 
     @Override
@@ -64,6 +73,7 @@ public class BuyAdapter extends RecyclerView.Adapter<BuyAdapter.BuyViewHolder> {
         return buyList.size();
     }
 
+    // JAVÍTVA: A belső osztály most már helyes
     public static class BuyViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         ImageView productImage;
@@ -72,6 +82,7 @@ public class BuyAdapter extends RecyclerView.Adapter<BuyAdapter.BuyViewHolder> {
         TextView productLocation;
         TextView productQuantity;
         Button cartButton;
+        Button detailsButton; // <--- ÚJ MEZŐ
 
         public BuyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -81,7 +92,10 @@ public class BuyAdapter extends RecyclerView.Adapter<BuyAdapter.BuyViewHolder> {
             productPrice = itemView.findViewById(R.id.product_price);
             productLocation = itemView.findViewById(R.id.product_location);
             productQuantity = itemView.findViewById(R.id.product_quantity);
-            cartButton = itemView.findViewById(R.id.button_add_to_cart);
+
+            // Győződj meg róla, hogy az item_buy.xml-ben ezek az ID-k vannak!
+            cartButton = itemView.findViewById(R.id.button_add_to_cart); // Vagy add_to_cart_button, ellenőrizd az XML-t!
+            detailsButton = itemView.findViewById(R.id.btnDetails);      // <--- ÚJ GOMB BEKÖTÉSE
         }
     }
 }

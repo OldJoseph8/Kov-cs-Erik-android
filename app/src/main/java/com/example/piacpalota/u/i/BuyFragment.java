@@ -9,17 +9,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation; // <-- FONTOS: Új import
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-// import com.example.piacpalota.MainActivity; // Erre már nincs szükség
 import com.example.piacpalota.R;
 import com.example.piacpalota.u.i.buylist.BuyAdapter;
 import com.example.piacpalota.u.i.buylist.Product;
-// --- FIREBASE IMPORT-ok TÖRÖLVE ---
-// import com.google.firebase.firestore.FirebaseFirestore;
-// import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,57 +25,65 @@ public class BuyFragment extends Fragment {
     private RecyclerView recyclerView;
     private BuyAdapter buyAdapter;
     private List<Product> buyList;
-    // private FirebaseFirestore db; // TÖRÖLVE
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // A 'view' változót itt hozzuk létre, ezt fogjuk használni a navigációhoz
         View view = inflater.inflate(R.layout.fragment_buy, container, false);
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // db = FirebaseFirestore.getInstance(); // TÖRÖLVE
         buyList = new ArrayList<>();
 
-        // --- MÓDOSÍTVA: "KAMU" ADATOK HOZZÁADÁSA A FIREBASE HELYETT ---
-        // Később ezeket az adatokat lecserélhetjük a 'Car' adatmodellünkre
-        buyList.add(new Product("BMW X5", "15.000.000 Ft", "1 db", "Budapest", "https://example.com/bmw.jpg"));
-        buyList.add(new Product("Audi A4", "8.500.000 Ft", "1 db", "Debrecen", "https://example.com/audi.jpg"));
-        buyList.add(new Product("Mercedes C-Class", "12.000.000 Ft", "1 db", "Szeged", "https://example.com/mercedes.jpg"));
-        // -----------------------------------------------------------------
+        // --- "KAMU" ADATOK ---
+        buyList.add(new Product("BMW X5", "15.000.000 Ft", "1 db", "Budapest", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/BMW_X5_%28G05%29_IMG_3953.jpg/1200px-BMW_X5_%28G05%29_IMG_3953.jpg"));
+        buyList.add(new Product("Audi A4", "8.500.000 Ft", "1 db", "Debrecen", "https://upload.wikimedia.org/wikipedia/commons/3/32/2019_Audi_A4_35_TDi_S_Line_S-Tronic_2.0_Front.jpg"));
+        buyList.add(new Product("Mercedes C-Class", "12.000.000 Ft", "1 db", "Szeged", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Mercedes-Benz_W205_Mopf_IMG_3690.jpg/1200px-Mercedes-Benz_W205_Mopf_IMG_3690.jpg"));
+        // ---------------------
 
+        // Az Adapter beállítása a két gomb eseménykezelőjével
+        buyAdapter = new BuyAdapter(getContext(), buyList, new BuyAdapter.OnProductClickListener() {
 
-        buyAdapter = new BuyAdapter(getContext(), buyList, product -> {
-            // Kosárba gomb adatátadása és navigáció
-            Bundle bundle = new Bundle();
-            bundle.putString("productName", product.getName());
-            bundle.putString("productPrice", product.getPrice());
-            bundle.putString("productQuantity", product.getQuantity());
-            bundle.putString("productLocation", product.getLocation());
-            bundle.putString("productImageUrl", product.getImageUrl());
+            // 1. KOSÁRBA GOMB KATTINTÁS
+            @Override
+            public void onAddToCartClick(Product product) {
+                try {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("productName", product.getName());
+                    bundle.putString("productPrice", product.getPrice());
+                    bundle.putString("productQuantity", product.getQuantity());
+                    bundle.putString("productLocation", product.getLocation());
+                    bundle.putString("productImageUrl", product.getImageUrl());
 
-            // --- EZ A RÉSZ LETT JAVÍTVA ---
-            // Helyi tranzakció (A régi, hibás kód):
-            // ShoppingFragment shoppingFragment = new ShoppingFragment();
-            // shoppingFragment.setArguments(bundle);
-            // ((MainActivity) requireActivity()).replaceFragment(shoppingFragment);
-
-            // ÚJ, MODERN NAVIGÁCIÓ:
-            try {
-                // A 'view' (a Fragment fő nézete) segítségével keressük a NavController-t
-                Navigation.findNavController(view).navigate(R.id.shoppingFragment, bundle);
-            } catch (Exception e) {
-                Log.e("BuyFragment", "Navigációs hiba: " + e.getMessage());
-                Toast.makeText(getContext(), "Hiba a kosár megnyitásakor", Toast.LENGTH_SHORT).show();
+                    // Navigálás a ShoppingFragment-re (Kosár)
+                    Navigation.findNavController(view).navigate(R.id.shoppingFragment, bundle);
+                } catch (Exception e) {
+                    Log.e("BuyFragment", "Navigációs hiba (Kosár): " + e.getMessage());
+                }
             }
-            // --- JAVÍTÁS VÉGE ---
-        });
-        recyclerView.setAdapter(buyAdapter);
 
-        // fetchProductsFromFirestore(); // TÖRÖLVE
+            // 2. RÉSZLETEK GOMB KATTINTÁS (Ez hiányzott!)
+            @Override
+            public void onDetailsClick(Product product) {
+                try {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("productName", product.getName());
+                    bundle.putString("productPrice", product.getPrice());
+                    bundle.putString("productQuantity", product.getQuantity());
+                    bundle.putString("productLocation", product.getLocation());
+                    bundle.putString("productImageUrl", product.getImageUrl());
+
+                    // Navigálás a CarDetailFragment-re (Részletes adatlap)
+                    Navigation.findNavController(view).navigate(R.id.carDetailFragment, bundle);
+                } catch (Exception e) {
+                    Log.e("BuyFragment", "Navigációs hiba (Részletek): " + e.getMessage());
+                }
+            }
+        });
+
+        recyclerView.setAdapter(buyAdapter);
 
         return view;
     }
-
-    // --- AZ EGÉSZ fetchProductsFromFirestore() FÜGGVÉNYT TÖRÖLTÜK ---
 }

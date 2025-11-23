@@ -8,64 +8,29 @@
     tools:context=".u.i.HomeFragment">
 
     <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/auto_animacio"
-        android:layout_width="399dp"
-        android:layout_height="304dp"
-        android:layout_marginTop="188dp"
-        android:layout_marginBottom="17dp"
-        app:lottie_rawRes="@raw/auto_animacio"  app:lottie_loop="true"
+        android:id="@+id/homeAnimation"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        app:lottie_rawRes="@raw/hello"
+        app:lottie_loop="true"
         app:lottie_autoPlay="true"
-        app:layout_constraintBottom_toTopOf="@+id/welcBuyButton"
+        app:layout_constraintBottom_toTopOf="@+id/btnEnter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingClass" />
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <Button
-        android:id="@+id/welcBuyButton"
-        android:layout_width="272dp"
-        android:layout_height="72dp"
-        android:layout_marginStart="118dp"
-        android:layout_marginTop="17dp"
-        android:layout_marginEnd="118dp"
-        android:layout_marginBottom="361dp"
-        android:text="Bejelentkezés"
-        android:textSize="34sp"
-        android:backgroundTint="#FFEB3B"  android:textColor="#000000"       app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/btnEnter"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="32dp"
+        android:text="Tovább a hirdetésekre"
+        android:textSize="18sp"
+        android:backgroundTint="#FF9800"
+        app:layout_constraintTop_toBottomOf="@+id/homeAnimation"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/auto_animacio" />
-
-    <Button
-        android:id="@+id/welcSaleButton"
-        android:layout_width="272dp"
-        android:layout_height="72dp"
-        android:layout_marginStart="118dp"
-        android:layout_marginTop="184dp"
-        android:layout_marginEnd="118dp"
-        android:layout_marginBottom="96dp"
-        android:text="Regisztráció"
-        android:textSize="34sp"
-        android:backgroundTint="#2196F3"  android:textColor="#FFFFFF"       app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcBuyButton" />
-
-    <TextView
-        android:id="@+id/homeText"
-        android:layout_width="272dp"
-        android:layout_height="75dp"
-        android:layout_marginTop="157dp"
-        android:layout_marginEnd="138dp"
-        android:layout_marginBottom="8dp"
-        android:text="Még nem regisztráltál? "
-        android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@+id/welcSaleButton"
-        app:layout_constraintEnd_toEndOf="@+id/welcBuyButton"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/welcBuyButton"
-        app:layout_constraintTop_toBottomOf="@+id/welcBuyButton"
-        app:layout_constraintVertical_bias="1.0" />
-
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
