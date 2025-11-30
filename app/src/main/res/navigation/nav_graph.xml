@@ -65,6 +65,7 @@
         android:name="com.example.piacpalota.u.i.WelcomeFragment"
         tools:layout="@layout/fragment_welcome" />
 
+    <!-- EZ A LÉNYEG A RÉSZLETEKHEZ: -->
     <fragment
         android:id="@+id/carDetailFragment"
         android:name="com.example.piacpalota.u.i.CarDetailFragment"
