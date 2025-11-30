@@ -1,6 +1,7 @@
 package com.example.piacpalota.u.i;
 
-import android.content.Intent;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,142 +12,105 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.piacpalota.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 public class AccountFragment extends Fragment {
 
-    private static final int PICK_IMAGE_REQUEST = 1; // Kép kiválasztásának kódja
-
-    private FirebaseUser user;
     private ImageView profileImageView;
     private EditText nameEditText;
     private Button uploadButton;
     private Button updateNameButton;
 
-    private StorageReference storageReference;
+    // Helyi adattároló (SharedPreferences)
+    private SharedPreferences sharedPreferences;
+    private static final String PREF_NAME = "UserProfile";
+    private static final String KEY_USER_NAME = "userName";
+    private static final String KEY_PROFILE_IMAGE = "profileImage";
 
-    public AccountFragment() {
-        // Required empty public constructor
-    }
+    // Modern képválasztó
+    private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
+            registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                if (uri != null) {
+                    // 1. Megjelenítjük a képet
+                    Glide.with(this)
+                            .load(uri)
+                            .circleCrop() // Kerek profilkép
+                            .into(profileImageView);
+
+                    // 2. Elmentjük a kép címét
+                    sharedPreferences.edit().putString(KEY_PROFILE_IMAGE, uri.toString()).apply();
+
+                    Toast.makeText(getContext(), "Profilkép frissítve!", Toast.LENGTH_SHORT).show();
+                }
+            });
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_account, container, false);
 
-        // Initialize Firebase User és Storage Referencia
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        storageReference = FirebaseStorage.getInstance().getReference("profile_pics");
+        // Adattároló inicializálása
+        sharedPreferences = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
-        // UI komponensek beállítása
+        // UI elemek
         profileImageView = view.findViewById(R.id.profileImageView);
         nameEditText = view.findViewById(R.id.nameEditText);
         uploadButton = view.findViewById(R.id.uploadButton);
         updateNameButton = view.findViewById(R.id.updateNameButton);
 
-        // Ha be van jelentkezve a felhasználó
-        if (user != null) {
-            // Megjelenítjük a felhasználó nevét
-            nameEditText.setText(user.getDisplayName());
+        // --- ADATOK BETÖLTÉSE ---
+        loadUserData();
 
-            // Megjelenítjük a felhasználó profilképét, ha van
-            if (user.getPhotoUrl() != null) {
-                // Ha van Firebase-ből kép, betöltjük
-                Glide.with(getContext())
-                        .load(user.getPhotoUrl())
-                        .into(profileImageView);
+        // --- GOMBOK KEZELÉSE ---
+
+        // 1. Képfeltöltés gomb
+        uploadButton.setOnClickListener(v -> {
+            pickMedia.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build());
+        });
+
+        // 2. Név frissítése gomb
+        updateNameButton.setOnClickListener(v -> {
+            String newName = nameEditText.getText().toString().trim();
+            if (!newName.isEmpty()) {
+                // Mentés a memóriába
+                sharedPreferences.edit().putString(KEY_USER_NAME, newName).apply();
+                Toast.makeText(getContext(), "Név sikeresen mentve!", Toast.LENGTH_SHORT).show();
             } else {
-                // Ha nincs Firebase-ből kép, akkor a helyettesítő kép (account.jpg) jelenik meg
-                Glide.with(getContext())
-                        .load(R.drawable.account) // account.jpg a drawable mappában
-                        .into(profileImageView);
+                Toast.makeText(getContext(), "A név nem lehet üres!", Toast.LENGTH_SHORT).show();
             }
-        }
-
-        // Feltöltés gomb eseménykezelője
-        uploadButton.setOnClickListener(v -> openFileChooser());
-
-        // Név frissítése gomb eseménykezelője
-        updateNameButton.setOnClickListener(v -> updateName());
+        });
 
         return view;
     }
 
-    // Kép kiválasztásának indítása
-    private void openFileChooser() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Profile Image"), PICK_IMAGE_REQUEST);
-    }
+    private void loadUserData() {
+        // Név betöltése (Alapértelmezett: "Felhasználó")
+        String savedName = sharedPreferences.getString(KEY_USER_NAME, "SmithCar Felhasználó");
+        nameEditText.setText(savedName);
 
-    // Kép kiválasztása után feltöltés Firebase Storage-ba
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
-            Uri imageUri = data.getData();
-            uploadImageToFirebase(imageUri);
-        }
-    }
-
-    // Kép feltöltése Firebase Storage-ba
-    private void uploadImageToFirebase(Uri imageUri) {
-        if (imageUri != null) {
-            StorageReference fileReference = storageReference.child(user.getUid() + ".jpg");
-            fileReference.putFile(imageUri)
-                    .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl()
-                            .addOnSuccessListener(uri -> {
-                                updateProfileImage(uri);
-                            }))
-                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Upload failed", Toast.LENGTH_SHORT).show());
-        }
-    }
-
-    // Frissítjük a profilképet Firebase Authentication-ban
-    private void updateProfileImage(Uri uri) {
-        if (user != null) {
-            user.updateProfile(new com.google.firebase.auth.UserProfileChangeRequest.Builder()
-                            .setPhotoUri(uri)
-                            .build())
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            // Frissítjük a képet
-                            Glide.with(getContext())
-                                    .load(uri)
-                                    .into(profileImageView);
-                            Toast.makeText(getContext(), "Profile image updated", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getContext(), "Failed to update image", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
-    }
-
-    // Frissítjük a felhasználó nevét Firebase Authentication-ban
-    private void updateName() {
-        String newName = nameEditText.getText().toString().trim();
-        if (user != null && !newName.isEmpty()) {
-            user.updateProfile(new com.google.firebase.auth.UserProfileChangeRequest.Builder()
-                            .setDisplayName(newName)
-                            .build())
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getContext(), "Name updated", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getContext(), "Failed to update name", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+        // Kép betöltése
+        String savedImageUri = sharedPreferences.getString(KEY_PROFILE_IMAGE, null);
+        if (savedImageUri != null) {
+            Glide.with(this)
+                    .load(Uri.parse(savedImageUri))
+                    .circleCrop()
+                    .placeholder(R.drawable.placeholder) // JAVÍTVA: account -> placeholder
+                    .into(profileImageView);
+        } else {
+            // Ha nincs mentett kép, az alapértelmezettet mutatjuk
+            Glide.with(this)
+                    .load(R.drawable.placeholder) // JAVÍTVA: account -> placeholder
+                    .circleCrop()
+                    .into(profileImageView);
         }
     }
 }

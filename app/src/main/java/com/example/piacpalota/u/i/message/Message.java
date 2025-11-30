@@ -9,7 +9,7 @@ public class Message {
     private Object timestamp;
 
     public Message() {
-        // Üres konstruktor szükséges a Firestore dokumentum leképezéséhez
+
     }
 
     public Message(String message, String senderId, String senderName, String receiverId, String receiverName, Object timestamp) {

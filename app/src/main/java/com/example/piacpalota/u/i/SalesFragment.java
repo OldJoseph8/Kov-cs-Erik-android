@@ -22,23 +22,39 @@ import com.example.piacpalota.u.i.buylist.CarRepository;
 import com.example.piacpalota.u.i.buylist.Product;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class SalesFragment extends Fragment {
 
     private ImageView ivSelectedImage;
-    private Uri selectedImageUri; // Itt tároljuk a kiválasztott képet
+    private List<String> selectedImageUris = new ArrayList<>(); // Lista a képeknek
 
-    // Egyszerű képválasztó
-    ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
-            registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
-                if (uri != null) {
-                    selectedImageUri = uri;
-                    // Megjelenítjük a képet
-                    Glide.with(this).load(uri).into(ivSelectedImage);
+    // --- TÖBB KÉP VÁLASZTÓ ---
+    // A (5) jelenti a maximum darabszámot
+    ActivityResultLauncher<PickVisualMediaRequest> pickMultipleMedia =
+            registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(5), uris -> {
+                if (!uris.isEmpty()) {
+                    // Ha választott képeket
+                    selectedImageUris.clear(); // Előző választás törlése
+
+                    // Átkonvertáljuk a kapott Uri-kat String-gé a tároláshoz
+                    for (Uri uri : uris) {
+                        selectedImageUris.add(uri.toString());
+                    }
+
+                    // Visszajelzés a felhasználónak
+                    Toast.makeText(getContext(), uris.size() + " kép kiválasztva!", Toast.LENGTH_SHORT).show();
+
+                    // Megjelenítjük az ELSŐ képet borítónak
+                    Glide.with(this)
+                            .load(uris.get(0))
+                            .into(ivSelectedImage);
+                } else {
+                    // Ha visszalépett választás nélkül
+                    Toast.makeText(getContext(), "Nem választottál képet.", Toast.LENGTH_SHORT).show();
                 }
             });
+    // -------------------------
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,7 +72,8 @@ public class SalesFragment extends Fragment {
 
         // Képválasztás indítása
         btnSelectImage.setOnClickListener(v -> {
-            pickMedia.launch(new PickVisualMediaRequest.Builder()
+            // Itt indítjuk a többes választót
+            pickMultipleMedia.launch(new PickVisualMediaRequest.Builder()
                     .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                     .build());
         });
@@ -73,15 +90,16 @@ public class SalesFragment extends Fragment {
                 return;
             }
 
-            // Képlista előkészítése (ha nincs kép, placeholder megy bele)
-            List<String> imagesToSave = new ArrayList<>();
-            if (selectedImageUri != null) {
-                imagesToSave.add(selectedImageUri.toString());
-            } else {
-                imagesToSave.add("https://via.placeholder.com/150");
+            // Ha nem választott képet, teszünk be egy placeholdert
+            if (selectedImageUris.isEmpty()) {
+                selectedImageUris.add("https://via.placeholder.com/150");
             }
 
-            // Termék létrehozása és mentése
+            // Mivel a selectedImageUris már lista, egyből átadhatjuk
+            // De készítünk róla egy másolatot, hogy biztonságos legyen
+            List<String> imagesToSave = new ArrayList<>(selectedImageUris);
+
+            // Termék létrehozása és mentése (most már listát adunk át)
             Product newCar = new Product(name, price, "1 db", location, description, imagesToSave);
             CarRepository.getInstance().addProduct(newCar);
 

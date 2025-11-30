@@ -1,16 +1,15 @@
 plugins {
-    id 'com.android.application' 
-    id 'com.google.gms.google-services'
+    id 'com.android.application'
 }
 
 android {
     namespace 'com.example.piacpalota'
-    compileSdk 35
+    compileSdk 34 // Vagy ami nálad be van állítva
 
     defaultConfig {
         applicationId "com.example.piacpalota"
         minSdk 24
-        targetSdk 35
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -23,33 +22,42 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
-    implementation libs.appcompat
-    implementation libs.material
-    implementation libs.activity
-    implementation libs.constraintlayout
-    implementation libs.firebase.auth
-    implementation libs.firebase.firestore
-    implementation libs.firebase.storage
-    implementation libs.firebase.database
-    implementation libs.recyclerview
-    testImplementation libs.junit
-    androidTestImplementation libs.ext.junit
-    androidTestImplementation libs.espresso.core
-    implementation libs.material.v190
-    implementation libs.navigation.fragment.v284
-    implementation libs.navigation.ui.v284
-    implementation libs.lottie.v600
-    implementation libs.glide
-    annotationProcessor libs.compiler
-    implementation libs.picasso
+    // Alapvető Android könyvtárak (Ezek valószínűleg már benne voltak)
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
+    // Navigáció (Ezeket már használtuk)
+    implementation 'androidx.navigation:navigation-fragment:2.7.7'
+    implementation 'androidx.navigation:navigation-ui:2.7.7'
 
+    // Képbetöltő (Glide) - Már használtuk
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+
+    // Lottie Animáció - Már használtuk
+    implementation "com.airbnb.android:lottie:6.1.0"
+
+    // --- EZEK HIÁNYZOTTAK A LAPOZÓHOZ ---
+    // ViewPager2 (A lapozható nézethez)
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+
+    // Material Components (A TabLayout-hoz és a pöttyökhöz)
+    // Ha a fenti 'com.google.android.material:material' sor már megvan, akkor ez nem kell külön!
+    // De a biztonság kedvéért itt hagyom:
+    implementation 'com.google.android.material:material:1.11.0'
+    // -------------------------------------
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    implementation 'com.google.android.material:material:1.11.0'
 }

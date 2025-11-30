@@ -29,7 +29,7 @@ public class CartManager {
     }
 
     public List<Product> getCartItems() {
-        return new ArrayList<>(cartItems); // Másolatot ad vissza az adatok integritása érdekében
+        return new ArrayList<>(cartItems);
     }
 
     public void clearCart() {
