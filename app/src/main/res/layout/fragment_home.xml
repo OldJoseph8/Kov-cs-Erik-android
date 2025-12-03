@@ -25,12 +25,13 @@
         android:layout_width="200dp"
         android:layout_height="60dp"
         android:layout_marginTop="32dp"
+        android:backgroundTint="#FF9800"
         android:text="Tovább a hirdetésekre"
         android:textSize="18sp"
-        android:backgroundTint="#FF9800"
-        app:layout_constraintTop_toBottomOf="@+id/homeAnimation"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/homeAnimation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

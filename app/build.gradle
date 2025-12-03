@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.piacpalota'
+    namespace 'com.example.smithcar'
     compileSdk 34 // Vagy ami nálad be van állítva
 
     defaultConfig {
-        applicationId "com.example.piacpalota"
+        applicationId "com.example.smithcar"
         minSdk 24
         targetSdk 34
         versionCode 1

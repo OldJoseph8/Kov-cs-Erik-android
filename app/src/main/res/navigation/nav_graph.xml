@@ -7,68 +7,59 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.piacpalota.u.i.HomeFragment"
+        android:name="com.example.smithcar.u.i.HomeFragment"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/salesFragment"
-        android:name="com.example.piacpalota.u.i.SalesFragment"
+        android:name="com.example.smithcar.u.i.SalesFragment"
         tools:layout="@layout/fragment_sales" />
 
     <fragment
         android:id="@+id/buyFragment"
-        android:name="com.example.piacpalota.u.i.BuyFragment"
+        android:name="com.example.smithcar.u.i.BuyFragment"
         tools:layout="@layout/fragment_buy" />
 
     <fragment
         android:id="@+id/uploadFragment"
-        android:name="com.example.piacpalota.u.i.UpLoadFragment"
+        android:name="com.example.smithcar.u.i.UpLoadFragment"
         tools:layout="@layout/fragment_up_load" />
 
     <fragment
         android:id="@+id/chooseFragment"
-        android:name="com.example.piacpalota.u.i.ChooseFragment"
+        android:name="com.example.smithcar.u.i.ChooseFragment"
         tools:layout="@layout/fragment_choose" />
 
     <fragment
         android:id="@+id/shoppingFragment"
-        android:name="com.example.piacpalota.u.i.ShoppingFragment"
+        android:name="com.example.smithcar.u.i.ShoppingFragment"
         tools:layout="@layout/fragment_shopping" />
 
     <fragment
         android:id="@+id/messagesFragment"
-        android:name="com.example.piacpalota.u.i.MessagesFragment"
+        android:name="com.example.smithcar.u.i.MessagesFragment"
         tools:layout="@layout/fragment_messages" />
 
     <fragment
         android:id="@+id/accountFragment"
-        android:name="com.example.piacpalota.u.i.AccountFragment"
+        android:name="com.example.smithcar.u.i.AccountFragment"
         tools:layout="@layout/fragment_account" />
 
     <fragment
         android:id="@+id/aboutFragment"
-        android:name="com.example.piacpalota.u.i.AboutFragment"
+        android:name="com.example.smithcar.u.i.AboutFragment"
         tools:layout="@layout/fragment_about" />
 
-    <fragment
-        android:id="@+id/singInFragment"
-        android:name="com.example.piacpalota.u.i.SingInFragment"
-        tools:layout="@layout/fragment_sing_in" />
-
-    <fragment
-        android:id="@+id/logInFragment"
-        android:name="com.example.piacpalota.u.i.LogInFragment"
-        tools:layout="@layout/fragment_log_in" />
 
     <fragment
         android:id="@+id/welcomeFragment"
-        android:name="com.example.piacpalota.u.i.WelcomeFragment"
+        android:name="com.example.smithcar.u.i.WelcomeFragment"
         tools:layout="@layout/fragment_welcome" />
 
     <!-- EZ A LÉNYEG A RÉSZLETEKHEZ: -->
     <fragment
         android:id="@+id/carDetailFragment"
-        android:name="com.example.piacpalota.u.i.CarDetailFragment"
+        android:name="com.example.smithcar.u.i.CarDetailFragment"
         tools:layout="@layout/fragment_car_detail" />
 
 </navigation>

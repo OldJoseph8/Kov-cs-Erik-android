@@ -24,7 +24,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PiacPalota"
+        android:theme="@style/Theme.SmithCar"
         tools:targetApi="31">
 
         <!-- Fő Activity, amely elindítja az alkalmazást -->

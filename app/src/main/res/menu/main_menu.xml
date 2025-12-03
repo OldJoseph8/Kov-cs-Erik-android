@@ -2,38 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-   <item android:id="@+id/action_home"
-       android:title="Főoldal"
-       android:icon="@drawable/baseline_home_white_19dp"
-       app:showAsAction="always" />
+    <!-- 1. Hirdetések (Böngészés) -->
+    <item
+        android:id="@+id/action_buy"
+        android:title="Hirdetések"
+        app:showAsAction="never" />
 
-   <item android:id="@+id/action_login"
-       android:title="Belépés"
-       android:icon="@drawable/baseline_home_white_19dp"
-       app:showAsAction="never" />
+    <!-- 2. Hirdetek (Feladás) -->
+    <item
+        android:id="@+id/action_sales"
+        android:title="Hirdetek"
+        app:showAsAction="never" />
 
-   <item android:id="@+id/action_singin"
-       android:title="Regisztráció"
-       android:icon="@drawable/baseline_home_white_19dp"
-       app:showAsAction="never" />
+    <!-- 3. Rólunk -->
+    <item
+        android:id="@+id/action_about"
+        android:title="Rólunk"
+        app:showAsAction="never" />
 
-   <item android:id="@+id/action_sales"
-       android:title="Eladás"
-       android:icon="@drawable/baseline_home_white_19dp"
-       app:showAsAction="never" />
-
-   <item android:id="@+id/action_buy"
-       android:title="Vásárlás"
-       android:icon="@drawable/baseline_home_white_19dp"
-       app:showAsAction="never" />
-
-   <item android:id="@+id/action_choose"
-       android:title="Kosár"
-       android:icon="@drawable/baseline_home_white_19dp"
-       app:showAsAction="never" />
-
-   <item android:id="@+id/action_about"
-       android:title="Rólunk"
-       android:icon="@drawable/baseline_home_white_19dp"
-       app:showAsAction="never" />
 </menu>
