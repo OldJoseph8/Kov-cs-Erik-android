@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".u.i.BuyFragment">
 
-    <!-- A lista megjelenítő (RecyclerView) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="0dp"
@@ -16,6 +15,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/item_buy" />
-    <!-- A tools:listitem csak az előnézethez kell, hogy lásd az elemeket az Android Studioban -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

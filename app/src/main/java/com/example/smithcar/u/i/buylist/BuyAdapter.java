@@ -55,18 +55,9 @@ public class BuyAdapter extends RecyclerView.Adapter<BuyAdapter.BuyViewHolder> {
                 .placeholder(R.drawable.placeholder)
                 .into(holder.productImage);
 
-        // Gombok eseménykezelői - FONTOS!
-        holder.cartButton.setOnClickListener(v -> {
-            if (onProductClickListener != null) {
-                onProductClickListener.onAddToCartClick(product);
-            }
-        });
-
-        holder.detailsButton.setOnClickListener(v -> {
-            if (onProductClickListener != null) {
-                onProductClickListener.onDetailsClick(product);
-            }
-        });
+        // KÖZVETLEN HÍVÁS - Ez a legbiztosabb!
+        holder.cartButton.setOnClickListener(v -> onProductClickListener.onAddToCartClick(product));
+        holder.detailsButton.setOnClickListener(v -> onProductClickListener.onDetailsClick(product));
     }
 
     @Override
@@ -92,8 +83,6 @@ public class BuyAdapter extends RecyclerView.Adapter<BuyAdapter.BuyViewHolder> {
             productPrice = itemView.findViewById(R.id.product_price);
             productLocation = itemView.findViewById(R.id.product_location);
             productQuantity = itemView.findViewById(R.id.product_quantity);
-
-            // Ellenőrizd, hogy az item_buy.xml-ben ezek az ID-k vannak-e!
             cartButton = itemView.findViewById(R.id.button_add_to_cart);
             detailsButton = itemView.findViewById(R.id.btnDetails);
         }

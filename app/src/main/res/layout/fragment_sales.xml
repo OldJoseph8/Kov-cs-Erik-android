@@ -1,186 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-
     android:layout_width="match_parent"
-
     android:layout_height="match_parent"
-
-    android:fillViewport="true">
-
-
+    android:fillViewport="true"
+    android:background="@android:color/white">
 
     <LinearLayout
-
         android:layout_width="match_parent"
-
         android:layout_height="wrap_content"
-
         android:orientation="vertical"
-
         android:padding="24dp"
-
         android:gravity="center_horizontal">
 
-
-
         <TextView
-
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
-
             android:text="Hirdetés Feladása"
-
             android:textSize="24sp"
-
             android:textStyle="bold"
-
+            android:textColor="@android:color/black"
             android:layout_marginBottom="24dp"/>
 
-
-
+        <!-- ADATMEZŐK -->
         <EditText
-
             android:id="@+id/inputName"
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:hint="Autó márkája és típusa"
-
+            android:inputType="textCapWords"
             android:minHeight="48dp"
-
             android:layout_marginBottom="16dp"/>
 
         <EditText
-
-            android:id="@+id/inputContact"
-
-            android:layout_width="match_parent"
-
-            android:layout_height="wrap_content"
-
-            android:hint="Elérhetőség (pl. Telefonszám, Email)"
-
-            android:inputType="textMultiLine"
-
-            android:minHeight="48dp"
-
-            android:layout_marginBottom="16dp"/>
-
-
-
-
-
-
-        <EditText
-
             android:id="@+id/inputPrice"
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:hint="Ár (pl. 2.500.000 Ft)"
-
             android:inputType="text"
-
             android:minHeight="48dp"
-
             android:layout_marginBottom="16dp"/>
 
-
-
         <EditText
-
             android:id="@+id/inputLocation"
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:hint="Telephely / Város"
-
+            android:inputType="textCapWords"
             android:minHeight="48dp"
-
             android:layout_marginBottom="16dp"/>
 
-
+        <EditText
+            android:id="@+id/inputContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Elérhetőség (pl. Telefonszám, Email)"
+            android:inputType="textMultiLine"
+            android:minHeight="48dp"
+            android:layout_marginBottom="16dp"/>
 
         <EditText
-
             android:id="@+id/inputDescription"
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:hint="Részletes leírás..."
-
             android:inputType="textMultiLine"
-
             android:lines="3"
-
             android:gravity="top|start"
-
             android:minHeight="100dp"
-
             android:layout_marginBottom="24dp"
-
             android:background="@android:drawable/edit_text"/>
 
-
-
+        <!-- KÉP MEGJELENÍTŐ -->
         <ImageView
-
             android:id="@+id/ivSelectedImage"
-
             android:layout_width="match_parent"
-
             android:layout_height="200dp"
-
             android:src="@drawable/placeholder"
-
             android:scaleType="centerCrop"
-
+            android:contentDescription="Kiválasztott kép"
             android:layout_marginBottom="16dp"
-
             android:background="#E0E0E0"/>
 
-
-
+        <!-- KÉPVÁLASZTÓ GOMB -->
         <Button
-
             android:id="@+id/btnSelectImage"
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:text="Kép kiválasztása"
-
             android:backgroundTint="#9C27B0"
-
             android:layout_marginBottom="32dp"/>
 
-
-
+        <!-- BEKÜLDÉS GOMB -->
         <Button
-
             android:id="@+id/btnSubmit"
-
             android:layout_width="match_parent"
-
             android:layout_height="60dp"
-
             android:text="Hirdetés Beküldése"
-
             android:backgroundTint="#2196F3"/>
 
-
-
     </LinearLayout>
-
 </ScrollView>

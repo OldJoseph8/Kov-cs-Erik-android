@@ -33,18 +33,20 @@ public class BuyFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        // Adatok betöltése a közös tárolóból
         buyList = CarRepository.getInstance().getProducts();
 
         buyAdapter = new BuyAdapter(getContext(), buyList, new BuyAdapter.OnProductClickListener() {
 
+            // Ha a "Kosárba" gombra nyomsz -> Irány a Kosár oldal
             @Override
             public void onAddToCartClick(Product product) {
                 navigateWithProduct(product, R.id.shoppingFragment);
             }
 
+            // Ha a "Részletek" gombra nyomsz -> Irány a Részletek oldal
             @Override
             public void onDetailsClick(Product product) {
-                // Ez visz a részletekhez!
                 navigateWithProduct(product, R.id.carDetailFragment);
             }
         });
@@ -53,6 +55,7 @@ public class BuyFragment extends Fragment {
         return view;
     }
 
+    // Ez a függvény végzi a nehéz munkát: becsomagolja az adatokat és lapoz
     private void navigateWithProduct(Product product, int destinationId) {
         try {
             Bundle bundle = new Bundle();
@@ -60,26 +63,43 @@ public class BuyFragment extends Fragment {
             bundle.putString("productPrice", product.getPrice());
             bundle.putString("productQuantity", product.getQuantity());
             bundle.putString("productLocation", product.getLocation());
-            bundle.putString("productDescription", product.getDescription());
 
-            // Elérhetőség hozzáadása (fontos a kapcsolat gombhoz!)
-            // Ha nincs a Product-ban, alapértelmezettet adunk
-            // (Ideiglenesen, amíg a Product osztályt nem frissíted teljesen)
-            bundle.putString("productContact", "+36 30 123 4567");
+            // Biztonságos adatátadás: Részletes leírás
+            String desc = product.getDescription();
+            bundle.putString("productDescription", desc != null && !desc.isEmpty() ? desc : "Nincs leírás.");
 
-            bundle.putStringArrayList("productImages", new ArrayList<>(product.getImages()));
+            // Képek átadása
+            ArrayList<String> images = new ArrayList<>();
+            if (product.getImages() != null) {
+                images.addAll(product.getImages());
+            }
+            // Ha nincs kép, teszünk bele egyet, hogy ne legyen üres
+            if (images.isEmpty()) {
+                images.add("https://via.placeholder.com/400");
+            }
+            bundle.putStringArrayList("productImages", images);
 
+            // Elérhetőség átadása
+            // JAVÍTVA: Most már a Product objektumból vesszük ki az adatot
+            String contact = product.getContactInfo();
+            bundle.putString("productContact", contact != null && !contact.isEmpty() ? contact : "+36 30 123 4567");
+
+            // Navigáció indítása
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).navigateTo(destinationId, bundle);
+            } else {
+                Log.e("BuyFragment", "Hiba: Nem találom a MainActivity-t!");
             }
+
         } catch (Exception e) {
-            Log.e("BuyFragment", "Hiba: " + e.getMessage());
+            Log.e("BuyFragment", "Navigációs hiba: " + e.getMessage());
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        // Frissítjük a listát, ha visszatérünk (pl. új hirdetés után)
         if (buyAdapter != null) {
             buyAdapter.notifyDataSetChanged();
         }

@@ -1,5 +1,3 @@
-
-
 package com.example.smithcar.u.i;
 
 import android.net.Uri;
@@ -62,8 +60,9 @@ public class SalesFragment extends Fragment {
         EditText inputName = view.findViewById(R.id.inputName);
         EditText inputPrice = view.findViewById(R.id.inputPrice);
         EditText inputLocation = view.findViewById(R.id.inputLocation);
-        EditText inputDescription = view.findViewById(R.id.inputDescription);
-        // Elérhetőség mező (opcionális, ha benne van az XML-ben)
+        EditText inputDescription = view.findViewById(R.id.inputDescription); // Leírás mező
+        // --- Elérhetőség mező megkeresése ---
+        // Győződj meg róla, hogy a fragment_sales.xml-ben van EditText az 'inputContact' ID-val!
         EditText inputContact = view.findViewById(R.id.inputContact);
 
         ivSelectedImage = view.findViewById(R.id.ivSelectedImage);
@@ -84,13 +83,16 @@ public class SalesFragment extends Fragment {
             String location = inputLocation.getText().toString();
             String description = inputDescription.getText().toString();
 
+            // --- Elérhetőség lekérése ---
             String contact = "";
             if (inputContact != null) {
                 contact = inputContact.getText().toString();
             }
 
+            // Ellenőrzés: Az elérhetőség megadása is legyen kötelező vagy ajánlott?
+            // Most tegyük kötelezővé a nevet, árat és helyszínt.
             if (name.isEmpty() || price.isEmpty() || location.isEmpty()) {
-                Toast.makeText(getContext(), "Kérlek tölts ki minden kötelező mezőt!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Kérlek tölts ki minden kötelező mezőt (Név, Ár, Hely)!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -102,7 +104,10 @@ public class SalesFragment extends Fragment {
             // Képlista másolata a mentéshez
             List<String> imagesToSave = new ArrayList<>(selectedImageUris);
 
-            // Termék létrehozása
+            // Termék létrehozása (Név, Ár, Mennyiség, Hely, Leírás, Elérhetőség, Képek)
+            // Itt adjuk át a 'contact' változót, ami a mezőből jön.
+            // Ez az adat csak a 'Product' objektumban lesz tárolva, és csak a CarDetailFragment-en
+            // a gombnyomáskor (intent hívásnál) lesz felhasználva.
             Product newCar = new Product(name, price, "1 db", location, description, contact, imagesToSave);
 
             // Mentés a közös tárolóba

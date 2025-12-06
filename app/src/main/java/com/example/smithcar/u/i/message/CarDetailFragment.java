@@ -21,15 +21,15 @@ import java.util.ArrayList;
 
 public class CarDetailFragment extends Fragment {
 
-    // Elérhetőség tárolása
-    private String contactInfo = "";
+    private String contactInfo = "+36 12 345 6789"; // Alapértelmezett szám
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // XML betöltése
         View view = inflater.inflate(R.layout.fragment_car_detail, container, false);
 
-        // UI elemek megkeresése
+        // Elemek megkeresése
         TextView nameText = view.findViewById(R.id.detailName);
         TextView priceText = view.findViewById(R.id.detailPrice);
         TextView locationText = view.findViewById(R.id.detailLocation);
@@ -37,65 +37,65 @@ public class CarDetailFragment extends Fragment {
         TextView descriptionText = view.findViewById(R.id.tvDescription);
         View btnContact = view.findViewById(R.id.btnContact);
 
-        // Lapozó elemek
         ViewPager2 viewPager = view.findViewById(R.id.viewPagerImages);
         TabLayout tabLayout = view.findViewById(R.id.tabLayoutIndicator);
 
-        // Képek listája
+        // Lista inicializálása
         ArrayList<String> images = new ArrayList<>();
 
-        // Adatok fogadása a Bundle-ből
+        // Adatok betöltése (Védett módban)
         if (getArguments() != null) {
-            nameText.setText(getArguments().getString("productName"));
-            priceText.setText(getArguments().getString("productPrice"));
-            locationText.setText(getArguments().getString("productLocation"));
-            quantityText.setText(getArguments().getString("productQuantity"));
+            String name = getArguments().getString("productName");
+            if (name != null) nameText.setText(name);
+            else nameText.setText("Név nem található");
 
-            // Leírás kezelése
+            String price = getArguments().getString("productPrice");
+            if (price != null) priceText.setText(price);
+
+            String loc = getArguments().getString("productLocation");
+            if (loc != null) locationText.setText(loc);
+
+            String quant = getArguments().getString("productQuantity");
+            if (quant != null) quantityText.setText(quant);
+
             String desc = getArguments().getString("productDescription");
             if (desc != null && !desc.isEmpty()) {
                 descriptionText.setText(desc);
             } else {
-                descriptionText.setText("Nincs elérhető leírás.");
+                descriptionText.setText("Nincs leírás.");
             }
 
-            // Elérhetőség elmentése a gombhoz
             String contact = getArguments().getString("productContact");
-            if (contact != null && !contact.isEmpty()) {
-                contactInfo = contact;
-            } else {
-                contactInfo = "+36 12 345 6789"; // Alapértelmezett szám, ha nincs megadva
-            }
+            if (contact != null && !contact.isEmpty()) contactInfo = contact;
 
-            // Képek listájának átvétele
             ArrayList<String> argsImages = getArguments().getStringArrayList("productImages");
-            if (argsImages != null && !argsImages.isEmpty()) {
+            if (argsImages != null) {
                 images.addAll(argsImages);
             }
+        } else {
+            // Ha nincs argumentum, akkor is írjon ki valamit
+            nameText.setText("HIBA: Nincs adatátadás!");
         }
 
-        // Ha véletlenül üres lenne a képlista, teszünk bele egy placeholdert
+        // Képkezelés (Ha üres a lista, tegyünk bele egy placeholdert)
         if (images.isEmpty()) {
             images.add("https://via.placeholder.com/400");
         }
 
-        // Adapter beállítása
+        // Adapter beállítása (MINDIG lefut)
         ImageSliderAdapter sliderAdapter = new ImageSliderAdapter(getContext(), images);
         viewPager.setAdapter(sliderAdapter);
 
-        // Pöttyök összekötése a lapozóval
-        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
-            // Ide nem kell szöveg
-        }).attach();
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {}).attach();
 
-        // Kapcsolat gomb - Tárcsázó megnyitása
+        // Gomb működése
         btnContact.setOnClickListener(v -> {
             try {
                 Intent intent = new Intent(Intent.ACTION_DIAL);
                 intent.setData(Uri.parse("tel:" + contactInfo));
                 startActivity(intent);
             } catch (Exception e) {
-                Toast.makeText(getContext(), "Elérhetőség: " + contactInfo, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Szám: " + contactInfo, Toast.LENGTH_LONG).show();
             }
         });
 
