@@ -1,11 +1,15 @@
 package com.example.smithcar.u.i;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog; // ÚJ IMPORT A DIALOGHOZ
+import android.content.Intent; // ÚJ IMPORT
+import android.net.Uri; // ÚJ IMPORT
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText; // ÚJ IMPORT
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,9 +31,11 @@ public class ShoppingFragment extends Fragment {
     private TextView emptyCartMessage;
     private Button submitOrderButton;
 
+    // Tároljuk az elérhetőséget
+    private String currentSellerContact = "+36 30 123 4567";
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Betöltjük a kosár kinézetét (fragment_shopping.xml)
         View view = inflater.inflate(R.layout.fragment_shopping, container, false);
 
         recyclerView = view.findViewById(R.id.recycler_view);
@@ -38,10 +44,8 @@ public class ShoppingFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Kosár tartalmának lekérése a közös CartManager-ből
         cartItems = CartManager.getInstance().getCartItems();
 
-        // Adapter beállítása (Törlés és mennyiség változtatás kezelése)
         cartAdapter = new CartAdapter(getContext(), cartItems, new CartAdapter.OnCartItemClickListener() {
             @Override
             public void onQuantityChange(Product product, String newQuantity) {
@@ -64,7 +68,7 @@ public class ShoppingFragment extends Fragment {
         });
         recyclerView.setAdapter(cartAdapter);
 
-        // --- ADATOK FOGADÁSA (Ha a "Kosárba" gombbal jöttünk ide) ---
+        // --- ADATOK FOGADÁSA ---
         Bundle bundle = getArguments();
         if (bundle != null) {
             String productName = bundle.getString("productName");
@@ -75,8 +79,11 @@ public class ShoppingFragment extends Fragment {
             String productDescription = bundle.getString("productDescription");
             if (productDescription == null) productDescription = "";
 
+            // Elérhetőség kinyerése és mentése
             String productContact = bundle.getString("productContact");
-            if (productContact == null) productContact = "Nincs megadva";
+            if (productContact != null && !productContact.isEmpty()) {
+                currentSellerContact = productContact;
+            }
 
             ArrayList<String> productImages = bundle.getStringArrayList("productImages");
             if (productImages == null) {
@@ -84,18 +91,16 @@ public class ShoppingFragment extends Fragment {
                 productImages.add("https://via.placeholder.com/150");
             }
 
-            // Termék létrehozása az adatokból
             Product product = new Product(
                     productName,
                     productPrice,
                     productQuantity,
                     productLocation,
                     productDescription,
-                    productContact,
+                    productContact, // Átadjuk a konstruktornak
                     productImages
             );
 
-            // Ellenőrizzük, hogy ne adjuk hozzá duplán, ha már benne van
             boolean alreadyInCart = false;
             for (Product p : cartItems) {
                 if (p.getName().equals(productName)) {
@@ -113,37 +118,81 @@ public class ShoppingFragment extends Fragment {
 
         updateCartView();
 
-        submitOrderButton.setOnClickListener(v -> submitOrder());
+        // A gomb most már a DIALOG-ot hozza fel
+        submitOrderButton.setOnClickListener(v -> {
+            if (!cartItems.isEmpty()) {
+                showContactDialog();
+            } else {
+                Toast.makeText(getContext(), "A kosár üres.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return view;
     }
 
-    // Ha üres a kosár, elrejtjük a listát és a gombot
-    private void updateCartView() {
-        if (cartItems.isEmpty()) {
-            recyclerView.setVisibility(View.GONE);
-            if (emptyCartMessage != null) emptyCartMessage.setVisibility(View.VISIBLE);
-            if (submitOrderButton != null) submitOrderButton.setVisibility(View.GONE);
-        } else {
-            recyclerView.setVisibility(View.VISIBLE);
-            if (emptyCartMessage != null) emptyCartMessage.setVisibility(View.GONE);
-            if (submitOrderButton != null) submitOrderButton.setVisibility(View.VISIBLE);
+    // --- A KAPCSOLAT ABLAK MEGJELENÍTÉSE ---
+    private void showContactDialog() {
+        try {
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            // Itt használjuk a korábban létrehozott dialog_contact.xml-t
+            View dialogView = inflater.inflate(R.layout.dialog_contact, null);
+
+            TextView tvPhone = dialogView.findViewById(R.id.tvPhoneNumber);
+            EditText etMessage = dialogView.findViewById(R.id.etMessage);
+
+            if (tvPhone != null) {
+                tvPhone.setText(currentSellerContact);
+            }
+
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Rendelés és Kapcsolat")
+                    .setView(dialogView)
+
+                    // GOMB 1: HÍVÁS
+                    .setPositiveButton("Hívás", (dialog, which) -> {
+                        try {
+                            Intent intent = new Intent(Intent.ACTION_DIAL);
+                            intent.setData(Uri.parse("tel:" + currentSellerContact));
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            Toast.makeText(getContext(), "Hiba a hívásnál", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+
+                    // GOMB 2: RENDELÉS KÜLDÉSE (Üzenettel)
+                    .setNeutralButton("Rendelés elküldése", (dialog, which) -> {
+                        String message = "";
+                        if (etMessage != null) {
+                            message = etMessage.getText().toString();
+                        }
+
+                        // Kosár ürítése és visszajelzés
+                        CartManager.getInstance().clearCart();
+                        cartAdapter.notifyDataSetChanged();
+                        updateCartView();
+
+                        Toast.makeText(getContext(), "Rendelés és üzenet elküldve!\n" + message, Toast.LENGTH_LONG).show();
+                    })
+
+                    // GOMB 3: MÉGSE
+                    .setNegativeButton("Mégse", null)
+                    .show();
+
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Hiba: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    // Rendelés leadása (csak kiüríti a kosarat és üzenetet küld)
-    @SuppressLint("NotifyDataSetChanged")
-    private void submitOrder() {
+    private void updateCartView() {
         if (cartItems.isEmpty()) {
-            Toast.makeText(getContext(), "A kosár üres.", Toast.LENGTH_SHORT).show();
-            return;
+            recyclerView.setVisibility(View.GONE);
+            emptyCartMessage.setVisibility(View.VISIBLE);
+            submitOrderButton.setVisibility(View.GONE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyCartMessage.setVisibility(View.GONE);
+            submitOrderButton.setVisibility(View.VISIBLE);
         }
-
-        CartManager.getInstance().clearCart();
-        cartAdapter.notifyDataSetChanged();
-        updateCartView();
-
-        Toast.makeText(getContext(), "Rendelés leadva!", Toast.LENGTH_SHORT).show();
     }
 
     @SuppressLint("NotifyDataSetChanged")
