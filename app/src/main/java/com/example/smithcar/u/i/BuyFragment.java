@@ -5,13 +5,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction; // Fontos import a kézi lapozáshoz
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.smithcar.MainActivity;
 import com.example.smithcar.R;
 import com.example.smithcar.u.i.buylist.BuyAdapter;
 import com.example.smithcar.u.i.buylist.CarRepository;
@@ -33,21 +34,21 @@ public class BuyFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Adatok betöltése a közös tárolóból
+        // Adatok betöltése
         buyList = CarRepository.getInstance().getProducts();
 
         buyAdapter = new BuyAdapter(getContext(), buyList, new BuyAdapter.OnProductClickListener() {
 
-            // Ha a "Kosárba" gombra nyomsz -> Irány a Kosár oldal
+            // 1. KOSÁRBA GOMB (Kézi lapozással)
             @Override
             public void onAddToCartClick(Product product) {
-                navigateWithProduct(product, R.id.shoppingFragment);
+                openFragment(new ShoppingFragment(), product);
             }
 
-            // Ha a "Részletek" gombra nyomsz -> Irány a Részletek oldal
+            // 2. RÉSZLETEK GOMB (Kézi lapozással)
             @Override
             public void onDetailsClick(Product product) {
-                navigateWithProduct(product, R.id.carDetailFragment);
+                openFragment(new CarDetailFragment(), product);
             }
         });
 
@@ -55,51 +56,47 @@ public class BuyFragment extends Fragment {
         return view;
     }
 
-    // Ez a függvény végzi a nehéz munkát: becsomagolja az adatokat és lapoz
-    private void navigateWithProduct(Product product, int destinationId) {
+    // --- "BOMBABIZTOS" KÉZI LAPOZÓ FÜGGVÉNY ---
+    // Ez kikerüli a NavController-t, és közvetlenül cseréli a képernyőt
+    private void openFragment(Fragment fragment, Product product) {
         try {
+            // Adatok becsomagolása
             Bundle bundle = new Bundle();
             bundle.putString("productName", product.getName());
             bundle.putString("productPrice", product.getPrice());
             bundle.putString("productQuantity", product.getQuantity());
             bundle.putString("productLocation", product.getLocation());
 
-            // Biztonságos adatátadás: Részletes leírás
+            // Biztonsági ellenőrzések az adatoknál
             String desc = product.getDescription();
-            bundle.putString("productDescription", desc != null && !desc.isEmpty() ? desc : "Nincs leírás.");
+            bundle.putString("productDescription", desc != null ? desc : "");
 
-            // Képek átadása
+            String contact = product.getContactInfo();
+            bundle.putString("productContact", contact != null ? contact : "+36 12 345 6789");
+
             ArrayList<String> images = new ArrayList<>();
-            if (product.getImages() != null) {
-                images.addAll(product.getImages());
-            }
-            // Ha nincs kép, teszünk bele egyet, hogy ne legyen üres
-            if (images.isEmpty()) {
-                images.add("https://via.placeholder.com/400");
-            }
+            if (product.getImages() != null) images.addAll(product.getImages());
+            if (images.isEmpty()) images.add("https://via.placeholder.com/400");
             bundle.putStringArrayList("productImages", images);
 
-            // Elérhetőség átadása
-            // JAVÍTVA: Most már a Product objektumból vesszük ki az adatot
-            String contact = product.getContactInfo();
-            bundle.putString("productContact", contact != null && !contact.isEmpty() ? contact : "+36 30 123 4567");
+            fragment.setArguments(bundle);
 
-            // Navigáció indítása
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).navigateTo(destinationId, bundle);
-            } else {
-                Log.e("BuyFragment", "Hiba: Nem találom a MainActivity-t!");
-            }
+            // A képernyőcsere végrehajtása
+            FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+            // Az R.id.nav_host_fragment a fő keret a MainActivity-ben
+            transaction.replace(R.id.nav_host_fragment, fragment);
+            transaction.addToBackStack(null); // Hogy a vissza gomb működjön
+            transaction.commit();
 
         } catch (Exception e) {
-            Log.e("BuyFragment", "Navigációs hiba: " + e.getMessage());
+            Log.e("BuyFragment", "Hiba a megnyitáskor: " + e.getMessage());
+            Toast.makeText(getContext(), "Hiba a megnyitáskor", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Frissítjük a listát, ha visszatérünk (pl. új hirdetés után)
         if (buyAdapter != null) {
             buyAdapter.notifyDataSetChanged();
         }
