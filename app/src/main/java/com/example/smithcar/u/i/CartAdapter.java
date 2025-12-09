@@ -116,8 +116,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             productQuantity = itemView.findViewById(R.id.product_quantity);
             productLocation = itemView.findViewById(R.id.product_location);
 
-            quantityButton = itemView.findViewById(R.id.button_quantity);
-            deleteButton = itemView.findViewById(R.id.button_delete);
+            quantityButton = itemView.findViewById(R.id.detailQuantity);
             messageButton = itemView.findViewById(R.id.button_message);
         }
     }
